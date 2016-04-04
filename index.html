@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>My Jquery Test</title>
+	<script type="text/javascript" src="jquery.js"></script>
+</head>
+<body>
+	<p>Fire</p>
+	<p id="cool">Fire</p>
+	<p class="nerds">Fire</p>
+	<p class="nerds">Fire</p>
+	<script>
+		$(document).ready(function() {
+			$('.nerds').on({
+				mouseenter: function() {
+					this.innerHTML = "Hello";
+				},
+				mouseleave: function() {
+					this.innerHTML = "Bye";
+				}
+			});
+		});
+	</script>
+</body>
+</html>
