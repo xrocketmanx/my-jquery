@@ -31,40 +31,39 @@ function jQuery(elements) {
 	var length = elements.length;
 
 	this.ready = function(handler) {
-		for (var i = 0; i < length; i++) {
-			elements[i].addEventListener('DOMContentLoaded', handler);
-		}
+		addHandlers('DOMContentLoaded', handler);
 	};
 
 	this.click = function(handler) {
-		for (var i = 0; i < length; i++) {
-			elements[i].addEventListener('click', handler);
-		}
+		addHandlers('click', handler);
 	};
 
-	this.mousenter = function(handler) {
-		for (var i = 0; i < length; i++) {
-			elements[i].addEventListener('mouseenter', handler);
-		}
+	this.mouseenter = function(handler) {
+		addHandlers('mouseenter', handler);
 	};
 
 	this.mouseleave = function(handler) {
-		for (var i = 0; i < length; i++) {
-			elements[i].addEventListener('mouseleave', handler);
-		}
+		addHandlers('mouseleave', handler);
 	};
 
 	this.hover = function(handlerEnter, handlerLeave) {
-		for (var i = 0; i < length; i++) {
-			elements[i].addEventListener('mouseenter', handlerEnter);
-			elements[i].addEventListener('mouseleave', handlerLeave);
-		}
+		addHandlers({
+			mouseenter: handlerEnter,
+			mouseleave: handlerLeave
+		});
 	};
 
 	this.on = function(event, handler) {
+		addHandlers(event, handler);
+	};
+
+	var addHandlers = function(event) {
 		if (typeof event === "string") {
+			var argsLength = arguments.length;
 			for (var i = 0; i < length; i++) {
-				elements[i].addEventListener(event, handler);
+				for (var j = 1; j < argsLength; j++) {
+					elements[i].addEventListener(event, arguments[j]);
+				}
 			}
 		} else if (typeof event === "object") {
 			for (var i = 0; i < length; i++) {

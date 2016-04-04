@@ -11,14 +11,9 @@
 	<p class="nerds">Fire</p>
 	<script>
 		$(document).ready(function() {
-			$('.nerds').on({
-				mouseenter: function() {
-					this.innerHTML = "Hello";
-				},
-				mouseleave: function() {
-					this.innerHTML = "Bye";
-				}
-			});
+			$('.nerds').mouseenter(function() {
+				this.innerHTML = "Hello";
+			}, 5);
 		});
 	</script>
 </body>
