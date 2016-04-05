@@ -30,6 +30,11 @@ function jQuery(elements) {
 	}
 	var length = elements.length;
 
+	/************************
+	*************************
+	Event Handling
+	*************************
+	************************/
 	this.ready = function(handler) {
 		addHandlers('DOMContentLoaded', handler);
 	};
@@ -57,7 +62,7 @@ function jQuery(elements) {
 		addHandlers(event, handler);
 	};
 
-	var addHandlers = function(event) {
+	function addHandlers(event) {
 		if (typeof event === "string") {
 			var argsLength = arguments.length;
 			for (var i = 0; i < length; i++) {
@@ -72,5 +77,24 @@ function jQuery(elements) {
 				}
 			}
 		}
+	};
+
+	/************************
+	*************************
+	Hide Show
+	*************************
+	************************/
+	var time = 10;
+
+	this.Timer = function(speed, animation, callback) {
+		var count = speed / 10;
+		var interval = setInterval(function() {
+			animation();
+			if(count === 0) {
+				clearInterval(interval);
+				callback();
+			}
+			count--;
+		}, time);
 	};
 }
