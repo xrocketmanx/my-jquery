@@ -6,14 +6,14 @@
 </head>
 <body>
 	<p>Fire</p>
-	<p id="cool">Fire</p>
+	<p id="cool" style="position: absolute; left: 5px;">Fire</p>
 	<p class="nerds">Fire</p>
 	<p class="nerds">Fire</p>
 	<script>
 		$(document).ready(function() {
-			$('.nerds').mouseenter(function() {
-				this.innerHTML = "Hello";
-			}, 5);
+			$('#cool').on('mouseenter', function() {
+				$(this).css('left', '+=5px');
+			});
 		});
 	</script>
 </body>

@@ -3,10 +3,10 @@ function $(element) {
 	return new jQuery(elements);
 
 	function select(element) {
-		if(element === undefined || element === null) {
+		if (element === undefined || element === null) {
 			return;
 		}
-		if(isNode(element)) {
+		if (isNode(element)) {
 			return [element];
 		} else if (isNodeList(element)) {
 			return element;
@@ -72,29 +72,67 @@ function jQuery(elements) {
 			}
 		} else if (typeof event === "object") {
 			for (var i = 0; i < length; i++) {
-				for(var key in event) {
+				for (var key in event) {
 					elements[i].addEventListener(key, event[key]);
 				}
 			}
 		}
-	};
+	}
 
 	/************************
 	*************************
-	Hide Show
+	Timer Functions
 	*************************
 	************************/
-	var time = 10;
+	this.Hide = function() {
+		return this;
+	}
 
-	this.Timer = function(speed, animation, callback) {
-		var count = speed / 10;
+	function Timer(func, speed, callback) {
+		var timeout = 10;
+		var count = speed / timeout;
 		var interval = setInterval(function() {
-			animation();
-			if(count === 0) {
+			func();
+			if (count < 1) {
 				clearInterval(interval);
 				callback();
+			} else {
+				count--;
 			}
-			count--;
-		}, time);
+		}, timeout);
+	}
+
+	/************************
+	*************************
+	Dom Manipulating
+	*************************
+	************************/
+	//refactor:
+	this.css = function(style, value) {
+		changeStyle(style, value);
 	};
+
+	function changeStyle(style, value) {
+		if (typeof style === "string") {
+			if (value.indexOf("+=") === 0) {
+				var delta = value.slice(2, value.length - 2);
+				for (var i = 0; i < length; i++) {
+					var oldStyle = elements[i].style[style];
+					var oldValue = oldStyle.slice(0, oldStyle.length - 2);
+					elements[i].style[style] = Number(oldValue) + Number(delta) + "px";
+					alert(elements[i].style[style]);
+				}
+			} else {
+				for (var i = 0; i < length; i++) {
+					elements[i].style[style] = value;
+				}
+			}
+		} else if (typeof style === "object") {
+			for (var i = 0; i < length; i++) {
+				for (var key in style) {
+					elements[i].style[key] = style[key];
+				} 			
+			}
+		}
+	}
 }
