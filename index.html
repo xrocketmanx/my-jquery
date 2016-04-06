@@ -3,16 +3,26 @@
 <head>
 	<title>My Jquery Test</title>
 	<script type="text/javascript" src="jquery.js"></script>
+	<style type="text/css">
+		div {
+			width: 100px;
+			height: 50px;
+			background-color: #AAA;
+			padding: 10px;
+		}
+		.cool {
+			height: 100px;
+			background-color: red;
+		}
+	</style>
 </head>
 <body>
-	<p>Fire</p>
-	<p id="cool" style="position: absolute; left: 5px;">Fire</p>
-	<p class="nerds">Fire</p>
-	<p class="nerds">Fire</p>
+	<div id="slide">Slide</div>
+	<div class="cool">Bla Bla Bla Bla Bla Bla Bla Bla Bla Bla Bla Bla Bla Bla Bla Bla</div>
 	<script>
 		$(document).ready(function() {
-			$('#cool').on('mouseenter', function() {
-				$(this).css('left', '+=5px');
+			$('#slide').click(function() {
+				$('.cool').toggle(1000);
 			});
 		});
 	</script>
