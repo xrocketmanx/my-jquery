@@ -325,6 +325,26 @@ function jQuery(elements) {
 		return this;
 	};
 
+	this.animate = function(css, speed, callback) {
+		var count = getCount(speed);
+		var deltas = [];
+		for (var key in css) {
+			deltas[key] = getStyleDeltas(key, css[key], count, getNormalPrefix);
+		}
+		Timer(function() {
+			for (var i = 0; i < length; i++) {
+				for (var key in css) {
+					addStyleValue(elements[i], key, deltas[key][i]);
+				}
+			}
+		}, 
+		count, 
+		function() {
+			if (callback !== undefined) callback();
+		});
+		return this;
+	}
+
 	var timeout = 10;
 	function getCount(speed) {
 		if (speed !== undefined) {
