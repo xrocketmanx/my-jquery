@@ -86,11 +86,67 @@ function jQuery(elements) {
 	************************/
 
 	this.hide = function(speed, callback) {
+		return safeCall(hide, this, speed, callback);
+	};
+
+	this.show = function(speed, callback) {
+		return safeCall(show, this, speed, callback);
+	};
+
+	this.toggle = function(speed, callback) {
+		return safeCall(toggle, this, speed, callback);
+	};
+
+	this.fadeToggle = function(speed, callback) {
+		return safeCall(fadeToggle, this, speed, callback);
+	};
+
+	this.fadeOut = function(speed, callback) {
+		return safeCall(fadeOut, this, speed, callback);
+	};
+
+	this.fadeIn = function(speed, callback) {
+		return safeCall(fadeIn, this, speed, callback);
+	};
+
+	this.fadeTo = function(speed, opacity, callback) {
+		return safeCall(fadeTo, this, speed, opacity, callback);
+	};
+
+	this.slideToggle = function(speed, callback) {
+		return safeCall(slideToggle, this, speed, callback);
+	};
+
+	this.slideUp = function(speed, callback) {
+		return safeCall(slideUp, this, speed, callback);
+	};
+
+	this.slideDown = function(speed, callback) {
+		return safeCall(slideDown, this, speed, callback);
+	};
+
+	this.animate = function(css, speed, callback) {
+		return safeCall(animate, this, css, speed, callback);
+	};
+
+	function safeCall(func) {
+		var summoner = arguments[1];
+		var args = [];
+		for (var i = 2; i < arguments.length; i++) {
+			args.push(arguments[i]);
+		}
+		waitQueue(createBlock(), function() {
+			func.apply(summoner, args);
+		});
+		return summoner;
+	}
+
+	function hide(speed, callback) {
 		var count = getCount(speed);
 		var heightDeltas = getHeightDeltas('0px', count, getNormalPrefix);
 		var opacityDeltas = getStyleDeltas('opacity', '0', count, getNormalPrefix);
 		changeStyleAll('overflow', 'hidden');
-		Timer(function() {
+		Timer.call(this, function() {
 			for (var i = 0; i < length; i++) {
 				addSize(elements[i], heightDeltas[i]);
 				addStyleValue(elements[i], 'opacity', opacityDeltas[i]);
@@ -106,12 +162,11 @@ function jQuery(elements) {
 				display: 'none',
 				overflow: ''
 			});
-			if (callback !== undefined) callback();
+			if (callback !== undefined) callback.call(this);
 		});
-		return this;
 	};
 
-	this.show = function(speed, callback) {
+	function show(speed, callback) {
 		var count = getCount(speed);
 		var heightDeltas = getHeightDeltas('0px', count, getReversedPrefix);
 		var opacityDeltas = getStyleDeltas('opacity', '0', count, getReversedPrefix);
@@ -123,7 +178,7 @@ function jQuery(elements) {
 			display: '',
 			overflow: 'hidden'
 		});
-		Timer(function() {
+		Timer.call(this, function() {
 			for (var i = 0; i < length; i++) {
 				addSize(elements[i], heightDeltas[i]);
 				addStyleValue(elements[i], 'opacity', opacityDeltas[i]);
@@ -138,12 +193,11 @@ function jQuery(elements) {
 				opacity: '',
 				overflow: ''
 			});
-			if (callback !== undefined) callback();
+			if (callback !== undefined) callback.call(this);
 		});
-		return this;
 	};
 
-	this.toggle = function(speed, callback) {
+	function toggle(speed, callback) {
 		var count = getCount(speed);
 		var heightDeltas = getHeightDeltas('0px', count, getDisplayBasedPrefix);
 		var opacityDeltas = getStyleDeltas('opacity', '0', count, getDisplayBasedPrefix);
@@ -155,7 +209,7 @@ function jQuery(elements) {
 				setHeight(elements[i], '0px');
 			}
 		}
-		Timer(function() {
+		Timer.call(this, function() {
 			for (var i = 0; i < length; i++) {
 				addSize(elements[i], heightDeltas[i]);
 				addStyleValue(elements[i], 'opacity', opacityDeltas[i]);
@@ -173,12 +227,11 @@ function jQuery(elements) {
 				opacity: '',
 				'overflow': ''
 			});
-			if (callback !== undefined) callback();
+			if (callback !== undefined) callback.call(this);
 		});
-		return this;
 	};
 
-	this.fadeToggle = function(speed, callback) {
+	function fadeToggle(speed, callback) {
 		var count = getCount(speed);
 		var opacityDeltas = getStyleDeltas('opacity', '0', count, getDisplayBasedPrefix);
 		for (var i = 0; i < length; i++) {
@@ -187,7 +240,7 @@ function jQuery(elements) {
 				setStyle(elements[i], 'opacity', parseStyleValue('0'));
 			}
 		}
-		Timer(function() {
+		Timer.call(this, function() {
 			for (var i = 0; i < length; i++) {
 				addStyleValue(elements[i], 'opacity', opacityDeltas[i]);
 			}
@@ -200,50 +253,46 @@ function jQuery(elements) {
 				}
 			}
 			changeStyleAll('opacity', '');
-			if (callback !== undefined) callback();
+			if (callback !== undefined) callback.call(this);
 		});
-		return this;
 	};
 
-	this.fadeOut = function(speed, callback) {
-		this.fadeTo(speed, '0', function() {
+	function fadeOut(speed, callback) {
+		fadeTo.call(this, speed, '0', function() {
 			changeStyleAll({
 				display: 'none',
 				opacity: ''
 			});
-			if (callback !== undefined) callback();
+			if (callback !== undefined) callback.call(this);
 		});
-		return this;
 	};
 
-	this.fadeIn = function(speed, callback) {
+	function fadeIn(speed, callback) {
 		changeStyleAll({
 			display: '',
 			opacity: '0'
 		});
-		this.fadeTo(speed, '1', function() {
-			if (callback !== undefined) callback();
+		fadeTo.call(this, speed, '1', function() {
+			if (callback !== undefined) callback.call(this);
 		});
-		return this;
 	};
 
-	this.fadeTo = function(speed, opacity, callback) {
+	function fadeTo(speed, opacity, callback) {
 		var count = getCount(speed);
 		var opacityDeltas = getStyleDeltas('opacity', opacity, count, getNormalPrefix);
 		changeStyleAll('display', '');
-		Timer(function() {
+		Timer.call(this, function() {
 			for (var i = 0; i < length; i++) {
 				addStyleValue(elements[i], 'opacity', opacityDeltas[i]);
 			}
 		}, 
 		count, 
 		function() {
-			if (callback !== undefined) callback();
+			if (callback !== undefined) callback.call(this);
 		});
-		return this;
 	};
 
-	this.slideToggle = function(speed, callback) {
+	function slideToggle(speed, callback) {
 		var count = getCount(speed);
 		var heightDeltas = getHeightDeltas('0px', count, getDisplayBasedPrefix);
 		changeStyleAll('overflow', 'hidden');
@@ -253,7 +302,7 @@ function jQuery(elements) {
 				setHeight(elements[i], '0px');
 			}
 		}
-		Timer(function() {
+		Timer.call(this, function() {
 			for (var i = 0; i < length; i++) {
 				addSize(elements[i], heightDeltas[i]);
 			}
@@ -269,16 +318,15 @@ function jQuery(elements) {
 			changeStyleAll({
 				overflow: ''
 			});
-			if (callback !== undefined) callback();
+			if (callback !== undefined) callback.call(this);
 		});
-		return this;
 	};
 
-	this.slideUp = function(speed, callback) {
+	function slideUp(speed, callback) {
 		var count = getCount(speed);
 		var heightDeltas = getHeightDeltas('0px', count, getNormalPrefix);
 		changeStyleAll('overflow', 'hidden');
-		Timer(function() {
+		Timer.call(this, function() {
 			for (var i = 0; i < length; i++) {
 				addSize(elements[i], heightDeltas[i]);
 			}
@@ -292,12 +340,11 @@ function jQuery(elements) {
 				display: 'none',
 				overflow: ''
 			});
-			if (callback !== undefined) callback();
+			if (callback !== undefined) callback.call(this);
 		});
-		return this;
 	};
 
-	this.slideDown = function(speed, callback) {
+	function slideDown(speed, callback) {
 		var count = getCount(speed);
 		var heightDeltas = getHeightDeltas('0px', count, getReversedPrefix);
 		for (var i = 0; i < length; i++) {
@@ -307,7 +354,7 @@ function jQuery(elements) {
 			overflow: 'hidden',
 			display: ''
 		});
-		Timer(function() {
+		Timer.call(this, function() {
 			for (var i = 0; i < length; i++) {
 				addSize(elements[i], heightDeltas[i]);
 			}
@@ -320,18 +367,17 @@ function jQuery(elements) {
 			changeStyleAll({
 				overflow: ''
 			});
-			if (callback !== undefined) callback();
+			if (callback !== undefined) callback.call(this);
 		});
-		return this;
 	};
 
-	this.animate = function(css, speed, callback) {
+	function animate(css, speed, callback) {
 		var count = getCount(speed);
 		var deltas = [];
 		for (var key in css) {
 			deltas[key] = getStyleDeltas(key, css[key], count, getNormalPrefix);
 		}
-		Timer(function() {
+		Timer.call(this, function() {
 			for (var i = 0; i < length; i++) {
 				for (var key in css) {
 					addStyleValue(elements[i], key, deltas[key][i]);
@@ -340,9 +386,8 @@ function jQuery(elements) {
 		}, 
 		count, 
 		function() {
-			if (callback !== undefined) callback();
+			if (callback !== undefined) callback.call(this);
 		});
-		return this;
 	}
 
 	var timeout = 10;
@@ -403,6 +448,13 @@ function jQuery(elements) {
 		var targetStyle = parseStyleValue(targetValue);
 		for (var i = 0; i < length; i++) {
 			currentStyle = parseStyleValue(getStyleValue(elements[i], style));
+			if (targetStyle.adding) {
+				if (targetStyle.sign === "+") {
+					targetStyle.value = currentStyle.value + targetStyle.value;
+				} else {
+					targetStyle.value = currentStyle.value - targetStyle.value;
+				}
+			}
 			prefix = getPrefix(elements[i], currentStyle, targetStyle);
 			var value = prefix + 
 				(Math.abs(currentStyle.value - targetStyle.value) / count) + 
@@ -412,12 +464,36 @@ function jQuery(elements) {
 		return deltas;
 	}
 
+	var blocks = [];
+	var blockingIndex = 0;
+
+	function createBlock() {
+		var index = blockingIndex++;
+		blocks.push(index);
+		return index;
+	}
+
+	function waitQueue(index, func) {
+		var interval = setInterval(function() {
+			if (blocks[0] === index) {
+				clearInterval(interval);
+				func();
+			}
+		}, 1);
+	}
+
+	function freeBlock() {
+		blocks.shift();
+	}
+
 	function Timer(func, count, callback) {
+		var summoner = this;
 		var interval = setInterval(function() {
 			func();
 			if (count <= 1) {
 				clearInterval(interval);
-				if (callback !== undefined) callback();
+				if (callback !== undefined) callback.call(summoner);
+				freeBlock();
 			} else {
 				count--;
 			}

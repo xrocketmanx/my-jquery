@@ -7,22 +7,27 @@
 		div {
 			width: 100px;
 			height: 50px;
-			background-color: #AAA;
-			padding: 10px;
-		}
-		.cool {
-			height: 100px;
 			background-color: red;
+			position: absolute;
+			top: 50px;
+			left: 100px;
 		}
 	</style>
 </head>
 <body>
-	<div id="slide">Slide</div>
-	<div class="cool">Bla Bla Bla Bla Bla Bla Bla Bla Bla Bla Bla Bla Bla Bla Bla Bla</div>
+	<button id="animate">Start animation</button>
+	<div class="cool"></div>
 	<script>
 		$(document).ready(function() {
-			$('#slide').click(function() {
-				$('.cool').toggle(1500);
+			$('#animate').click(function() {
+				$('.cool').animate({
+					left: '+=50px'
+				}, 200, function() {
+					var r = Math.floor(Math.random() * 256);
+					var g = Math.floor(Math.random() * 256);
+					var b = Math.floor(Math.random() * 256);
+					this.css('backgroundColor', 'rgb(' + r + ',' + g + ',' + b + ')');
+				});	
 			});
 		});
 	</script>
