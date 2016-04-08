@@ -11,17 +11,46 @@ function $(element) {
 		} else if (isNodeList(element)) {
 			return element;
 		} else if (typeof element === "string") {
-			return document.querySelectorAll(element);
+			try {
+				var elements = document.querySelectorAll(element);
+				if (elements.length === 0) throw "query selector returned []";
+				return elements;
+			} catch(exception) {
+				return [parseHTML(element)];
+			}
 		}
-	};
+	}
+
+	function parseHTML(element) {
+		if (isTag(element)) {
+			var tagName = "";
+			var tagLength = 0;
+			for (var i = 1; i < element.length; i++) {
+				if (element.charAt(i) === ">") {
+					tagLength = i + 1;
+					break;
+				}
+				tagName += element.charAt(i);
+			}
+			var tag = document.createElement(tagName);
+			tag.innerHTML = element.slice(tagLength, element.length - tagLength - 1);
+			return tag;
+		} else {
+			return document.createTextNode(element);
+		}
+	}
+
+	function isTag(element) {
+		return element[0] === '<';
+	}
 
 	function isNodeList(element) {
 		return element.constructor.name === "NodeList";
-	};
+	}
 
 	function isNode(element) {
 		return element.constructor.name.indexOf("HTML") >= 0;
-	};
+	}
 }
 
 function jQuery(elements) {
@@ -29,6 +58,9 @@ function jQuery(elements) {
 		throw "jquery selector is null or undefined";
 	}
 	var length = elements.length;
+	this.getElements = function() {
+		return elements;
+	};
 
 	/************************
 	*************************
@@ -444,10 +476,11 @@ function jQuery(elements) {
 	function getStyleDeltas(style, targetValue, count, getPrefix) {
 		var deltas = [];
 		var currentStyle;
+		var targetStyle;
 		var prefix;
-		var targetStyle = parseStyleValue(targetValue);
 		for (var i = 0; i < length; i++) {
 			currentStyle = parseStyleValue(getStyleValue(elements[i], style));
+			targetStyle = parseStyleValue(targetValue);
 			if (targetStyle.adding) {
 				if (targetStyle.sign === "+") {
 					targetStyle.value = currentStyle.value + targetStyle.value;
@@ -657,6 +690,223 @@ function jQuery(elements) {
 		} 
 	};
 
+	this.append = function() {
+		addElement(function(parent, nodes) {
+			for (var i = 0; i < nodes.length; i++) {
+				parent.appendChild(nodes[i].cloneNode(true));
+			}
+		}, arguments);
+	};
+
+	this.appendTo = function() {
+		for (var i = 0; i < arguments.length; i++) {
+			if (!isJQuery(arguments[i])) {
+				object = $(arguments[i]);
+			} else {
+				object = arguments[i];
+			}
+			object.append(this);
+		}
+	};
+
+	this.prepend = function() {
+		addElement(function(parent, nodes) {
+			if(parent.firstChild) {
+				var firstChild = parent.firstChild;
+				for (var i = 0; i < nodes.length; i++) {
+					parent.insertBefore(nodes[i].cloneNode(true), 
+										firstChild);
+				}
+			} else {
+				for (var i = 0; i < nodes.length; i++) {
+					parent.appendChild(nodes[i].cloneNode(true));
+				}
+			}
+		}, arguments);
+	};
+
+	this.after = function() {
+		addElement(function(element, nodes) {
+			if(element.nextSibling) {
+				var next = element.nextSibling;
+				for (var i = 0; i < nodes.length; i++) {
+					element.parentNode.insertBefore(nodes[i], 
+												next);
+				}
+			} else {
+				for (var i = 0; i < nodes.length; i++) {
+					element.parentNode.appendChild(nodes[i].cloneNode(true));
+				}
+			}
+		}, arguments);
+	};
+
+	this.before = function() {
+		addElement(function(element, nodes) {
+			for (var i = 0; i < nodes.length; i++) {
+				element.parentNode.insertBefore(nodes[i], element);
+			}
+		}, arguments);
+	};
+
+	this.remove = function() {
+		for (var i = 0; i < length; i++) {
+			elements[i].parentNode.removeChild(elements[i]);
+		}
+	};
+
+	this.empty = function() {
+		for (var i = 0; i < length; i++) {
+			elements[i].innerHTML = "";
+		}
+	};
+
+	function addElement(addFunction) {
+		var args = arguments[1];
+		var object;
+		var nodes = [];
+		for (var i = 0; i < args.length; i++) {
+			if (!isJQuery(args[i])) {
+				object = $(args[i]);
+			} else {
+				object = args[i];
+			}
+			nodes.push.apply(nodes, object.getElements());
+		}
+		for (var i = 0; i < nodes.length; i++) {
+			if(nodes[i].parentNode) {
+				nodes[i].parentNode.removeChild(nodes[i]);
+			}
+		}
+		for (var i = 0; i < length; i++) {
+			addFunction(elements[i], nodes);
+		}
+	}
+
+	this.addClass = function(value) {
+		var classes = value.split(' ');
+		for (var i = 0; i < length; i++) {
+			elements[i].classList.add.apply(elements[i].classList, classes);
+		}
+	}
+
+	this.removeClass = function(value) {
+		var classes = value.split(' ');
+		for (var i = 0; i < length; i++) {
+			elements[i].classList.remove.apply(elements[i].classList, classes);
+		}
+	}
+
+	this.toggleClass = function(value) {
+		var classes = value.split(' ');
+		for (var i = 0; i < length; i++) {
+			list = elements[i].classList;
+			for (var j = 0; j < classes.length; j++) {
+				if (list.contains(classes[j])) {
+					list.remove(classes[j]);
+				} else {
+					list.add(classes[j]);
+				}
+			}
+		}
+	}
+
+	/************************
+	*************************
+	Dimensions
+	*************************
+	************************/
+	this.width = function(value) {
+		return size('width', value);
+	};
+
+	this.height = function(value) {
+		return size('height', value);
+	};
+
+	function size(dimension, value) {
+		if (isUndefined(value)) {
+			return getStyleValue(elements[0], dimension);
+		} else {
+			for (var i = 0; i < length; i++) {
+				setStyle(elements[i], dimension, parseStyleValue(value)); 
+			}
+		}
+	}
+
+	this.innerWidth = function(value) {
+		return innerSize('width', value);
+	};
+
+	this.innerHeight = function(value) {
+		return innerSize('height', value);
+	};
+
+	function innerSize(dimension, value) {
+		var temp;
+		if (dimension == 'height') {
+			temp = ['Top', 'Bottom'];
+		} else {
+			temp = ['Left', 'Right'];
+		}
+		if (isUndefined(value)) {
+			var element = elements[0];
+			var size = parseStyleValue(getStyleValue(element, dimension));
+			var paddingA = parseStyleValue(getStyleValue(element, 'padding' + temp[0]));
+			var paddingB = parseStyleValue(getStyleValue(element, 'padding' + temp[1]));
+			return size.value + paddingA.value + paddingB.value + size.measure;
+		} else {
+			for (var i = 0; i < length; i++) {
+				var size = parseStyleValue(getStyleValue(elements[i], dimension));
+				var paddingA = parseStyleValue(getStyleValue(elements[i], 'padding' + temp[0]));
+				var paddingB = parseStyleValue(getStyleValue(elements[i], 'padding' + temp[1]));
+				styleValue = parseStyleValue(value);
+				styleValue.fullValue = 
+					styleValue.value - paddingA.value - paddingB.value + styleValue.measure;
+				setStyle(elements[i], dimension, styleValue);
+			}
+		}
+	}
+
+	this.outerWidth = function(value) {
+		return outerSize('width', value);
+	};
+
+	this.outerHeight = function(value) {
+		return outerSize('height', value);
+	};
+
+	function outerSize(dimension, value) {
+		var temp;
+		if (dimension == 'height') {
+			temp = ['Top', 'Bottom'];
+		} else {
+			temp = ['Left', 'Right'];
+		}
+		if (isUndefined(value)) {
+			var element = elements[0];
+			var size = parseStyleValue(getStyleValue(element, dimension));
+			var paddingA = parseStyleValue(getStyleValue(element, 'padding' + temp[0]));
+			var paddingB = parseStyleValue(getStyleValue(element, 'padding' + temp[1]));
+			var borderA = parseStyleValue(getStyleValue(element, 'border' + temp[0] + "Width"));
+			var borderB = parseStyleValue(getStyleValue(element, 'border' + temp[1] + "Width"));
+			return size.value + paddingA.value + paddingB.value + borderA.value + borderB.value + size.measure;
+		} else {
+			for (var i = 0; i < length; i++) {
+				var size = parseStyleValue(getStyleValue(elements[i], dimension));
+				var paddingA = parseStyleValue(getStyleValue(elements[i], 'padding' + temp[0]));
+				var paddingB = parseStyleValue(getStyleValue(elements[i], 'padding' + temp[1]));
+				var borderA = parseStyleValue(getStyleValue(elements[i], 'border' + temp[0] + "Width"));
+				var borderB = parseStyleValue(getStyleValue(elements[i], 'border' + temp[1] + "Width"));
+				styleValue = parseStyleValue(value);
+				styleValue.fullValue = 
+					styleValue.value - paddingA.value - paddingB.value - 
+					borderA.value - borderB.value + styleValue.measure;
+				setStyle(elements[i], dimension, styleValue);
+			}
+		}
+	}
+
 	/************************
 	*************************
 	Type compare
@@ -672,5 +922,9 @@ function jQuery(elements) {
 
 	function isFunction(value) {
 		return typeof value === "function";
+	}
+
+	function isJQuery(value) {
+		return value.constructor.name.indexOf("jQuery") >= 0;
 	}
 }
