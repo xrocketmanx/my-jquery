@@ -63,7 +63,7 @@ function jQuery(elements) {
 	};
 
 	function addHandlers(event) {
-		if (typeof event === "string") {
+		if (isString(event)) {
 			var argsLength = arguments.length;
 			for (var i = 0; i < length; i++) {
 				for (var j = 1; j < argsLength; j++) {
@@ -502,7 +502,7 @@ function jQuery(elements) {
 
 	/************************
 	*************************
-	Style Manipulating
+	Style Manipulation
 	*************************
 	************************/
 	this.css = function(style, value) {
@@ -515,11 +515,11 @@ function jQuery(elements) {
 	};
 
 	function isCssRequest(style, value) {
-		return typeof style === "string" && value === undefined;
+		return isString(style) && isUndefined(value);
 	}
 
 	function changeStyleAll(style, value) {
-		if (typeof style === "string") {
+		if (isString(style)) {
 			var styleValue = parseStyleValue(value);
 			if (styleValue.adding) {
 				for (var i = 0; i < length; i++) {
@@ -584,5 +584,93 @@ function jQuery(elements) {
 		}
 		result.value = Number(value);
 		return result;
+	}
+
+	/************************
+	*************************
+	Dom Manipulation
+	*************************
+	************************/
+	this.html = function(value) {
+		if (isUndefined(value)) {
+			return elements[0].innerHTML;
+		} else if (isString(value)) {
+			for (var i = 0; i < length; i++) {
+				elements[i].innerHTML = value;
+			}
+		} else if (isFunction(value)) {
+			for (var i = 0; i < length; i++) {
+				elements[i].innerHTML = value(i, elements[i].innerHTML);
+			}
+		}
+	};
+
+	this.text = function(value) {
+		if (isUndefined(value)) {
+			var text = "";
+			for (var i = 0; i < length; i++) {
+				text += elements[i].innerText;
+			}
+			return text;
+		} else if (isString(value)) {
+			for (var i = 0; i < length; i++) {
+				elements[i].innerText = value;
+			}
+		} else if (isFunction(value)) {
+			for (var i = 0; i < length; i++) {
+				elements[i].innerText = value(i, elements[i].innerText);
+			}
+		}
+	};
+
+	this.val = function(value) {
+		if (isUndefined(value)) {
+			return elements[0].value;
+		} else if (isString(value)) {
+			for (var i = 0; i < length; i++) {
+				elements[i].value = value;
+			}
+		} else if (isFunction(value)) {
+			for (var i = 0; i < length; i++) {
+				elements[i].value = value(i, elements[i].value);
+			}
+		}
+	};
+
+	this.attr = function(attr, value) {
+		if (isString(attr) && isUndefined(value)) {
+			return elements[0][attr];
+		} else if (isString(value) && isString(attr)) {
+			for (var i = 0; i < length; i++) {
+				elements[i][attr] = value;
+			}
+		} else if (isFunction(value)) {
+			for (var i = 0; i < length; i++) {
+				elements[i][attr] = value(i, elements[i][attr]);
+			}
+		} else if (typeof attr === "object") {
+			for (var i = 0; i < length ; i++) {
+				for (var key in attr) {
+					elements[i][key] = attr[key];
+				}
+			}
+		} 
+	};
+
+	/************************
+	*************************
+	Type compare
+	*************************
+	************************/
+	function isUndefined(value) {
+		return value === undefined;
+	}
+
+	function isString(value) {
+		return typeof value === "string";
+	}
+
+	function isFunction(value) {
+		return typeof value === "function";
 	}
 }

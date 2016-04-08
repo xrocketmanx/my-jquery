@@ -17,6 +17,9 @@
 <body>
 	<button id="animate">Start animation</button>
 	<div class="cool"></div>
+	<input type="text" value="loh"></input>
+	<p>Hello</p>
+	<p>World</p>
 	<script>
 		$(document).ready(function() {
 			$('#animate').click(function() {
@@ -28,6 +31,9 @@
 					var b = Math.floor(Math.random() * 256);
 					this.css('backgroundColor', 'rgb(' + r + ',' + g + ',' + b + ')');
 				});	
+			});
+			$('input').attr('value', function(i, old) {
+				return old + "!!!!" + "(" + i + ")";
 			});
 		});
 	</script>
