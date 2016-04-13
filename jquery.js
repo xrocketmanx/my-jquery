@@ -909,6 +909,35 @@ function jQuery(elements) {
 
 	/************************
 	*************************
+	Dimensions
+	*************************
+	************************/
+	this.parent = function() {
+		return elements[0].parentNode;
+	};
+
+	this.parents = function() {
+		var ancerstors = [];
+		var current = elements[0];
+		while (current.parentNode) {
+			ancerstors.push(current.parentNode);
+			current = current.parentNode;
+		}
+		return ancerstors;
+	};
+
+	this.parentsUntil = function(template) {
+		var ancerstors = [];
+		var current = elements[0];
+		while (current.parentNode && current.localName !== template) {
+			ancerstors.push(current.parentNode);
+			current = current.parentNode;
+		}
+		return ancerstors;
+	};
+
+	/************************
+	*************************
 	Type compare
 	*************************
 	************************/

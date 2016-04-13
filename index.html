@@ -21,6 +21,7 @@
 	<div class="cool">Some text</div>
 	<script>
 		$(document).ready(function() {
+			alert($("button").parentsUntil("html"));
 			$('#animate').click(function() {
 				$(this).attr("disabled", "disabled");
 				$('.cool').animate({
