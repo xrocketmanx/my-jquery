@@ -8,7 +8,7 @@ function $(element) {
 		}
 		if (isNode(element)) {
 			return [element];
-		} else if (isNodeList(element)) {
+		} else if (isNodeList(element) || isArray(element)) {
 			return element;
 		} else if (typeof element === "string") {
 			try {
@@ -46,6 +46,10 @@ function $(element) {
 
 	function isNodeList(element) {
 		return element.constructor.name === "NodeList";
+	}
+
+	function isArray(element) {
+		return element.constructor.name === "Array";
 	}
 
 	function isNode(element) {
@@ -912,29 +916,137 @@ function jQuery(elements) {
 	Dimensions
 	*************************
 	************************/
+	this.last = function() {
+		return $(elements[length - 1]);
+	};
+
+	this.first = function() {
+		return $(elements[0]);
+	};
+
 	this.parent = function() {
-		return elements[0].parentNode;
+		return $(elements[0].parentNode);
 	};
 
 	this.parents = function() {
-		var ancerstors = [];
-		var current = elements[0];
-		while (current.parentNode) {
-			ancerstors.push(current.parentNode);
-			current = current.parentNode;
-		}
-		return ancerstors;
+		var ancerstors = getRelatives(elements[0], "parentNode");
+		return $(ancerstors);
 	};
 
 	this.parentsUntil = function(template) {
-		var ancerstors = [];
-		var current = elements[0];
-		while (current.parentNode && current.localName !== template) {
-			ancerstors.push(current.parentNode);
-			current = current.parentNode;
-		}
-		return ancerstors;
+		var ancerstors = getRelatives(elements[0], "parentNode", template, true);
+		return $(ancerstors);
 	};
+
+	this.children = function(template) {
+		if (isUndefined(template)) {
+			return $(elements[0].childNodes);
+		}
+		var childNodes = elements[0].childNodes;
+		var nodes = [];
+		for (var i = 0; i < childNodes.length; i++) {
+			if (childNodes[i].localName === template) {
+				nodes.push(childNodes[i]);
+			}
+		}
+		return $(nodes);
+	};
+
+	this.find = function (template) {
+		return $(finding(elements[0] ,template));
+	};
+
+	var finding = function search(node, template) {
+		var nodes = [];
+		var childNodes = node.childNodes;
+		for (var i = 0; i < childNodes.length; i++) {
+			if (!template || childNodes[i].matches(template)) {
+				nodes.push(childNodes[i]);
+			}
+			nodes.push.apply(nodes, search(childNodes[i], template));
+		}
+		return nodes;
+	};
+
+	this.siblings = function(template) {
+		var nodes = getRelatives(elements[0], "previousElementSibling", template).reverse();
+		nodes.push.apply(nodes, getRelatives(elements[0], "nextElementSibling", template)); 
+		return $(nodes);
+	};
+
+	this.next = function() {
+		if (elements[0].nextElementSibling) {
+			return $(elements[0].nextElementSibling);
+		} else {
+			return null;
+		}
+	};
+
+	this.prev = function() {
+		if (elements[0].previousElementSibling) {
+			return $(elements[0].previousElementSibling);
+		} else {
+			return null;
+		}
+	};
+
+	this.nextAll = function() {
+		var next = getRelatives(elements[0], "nextElementSibling");
+		return $(next);
+	};
+
+	this.prevAll = function() {
+		var prev = getRelatives(elements[0], "previousElementSibling").reverse();
+		return $(prev);
+	};
+
+	this.nextUntil = function(template) {
+		var next = getRelatives(elements[0], "nextElementSibling", template, true);
+		return $(next);
+	};
+
+	this.prevUntil = function(template) {
+		var prev = getRelatives(elements[0], "previousElementSibling", template, true).reverse();
+		return $(prev);
+	};
+
+	this.filter = function(template) {
+		var nodes = [];
+		for (var i = 0; i < length; i++) {
+			if (elements[i].matches(template)) {
+				nodes.push(elements[i]);
+			}
+		}
+		return $(nodes);
+	};
+
+	this.not = function(template) {
+		var nodes = [];
+		for (var i = 0; i < length; i++) {
+			if (!elements[i].matches(template)) {
+				nodes.push(elements[i]);
+			}
+		}
+		return $(nodes);
+	}
+
+	function getRelatives(element, relativeName, template, breaking) {
+		var nodes = [];
+		while (element[relativeName]) {
+			element = element[relativeName];
+			if (template) {
+				if (element.matches(template)) {
+					nodes.push(element);
+					if (breaking) break;
+				} else if (breaking) {
+					nodes.push(element);
+				}
+			} else {
+				nodes.push(element);
+			}
+		}
+		return nodes;
+	}
 
 	/************************
 	*************************
