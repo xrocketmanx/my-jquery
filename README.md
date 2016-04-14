@@ -8,3 +8,4 @@ Realized methods:
 	-style manipulations(css, add- remove- toggle- Class, html, text, attr, val)
 	-DOM manipulations(apend, prepend, after, before, remove, empty)
 	-dimensional methods(width, heigth, innerWidth, innerHeight, outerWidth, outerHeight)
+	-traversing methods
