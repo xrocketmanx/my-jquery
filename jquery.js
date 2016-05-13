@@ -1,3 +1,4 @@
+"use strict";
 function $(element) {
 	var elements = select(element);
 	return new jQuery(elements);
@@ -165,16 +166,34 @@ function jQuery(elements) {
 		return safeCall(animate, this, css, speed, callback);
 	};
 
-	function safeCall(func) {
-		var summoner = arguments[1];
-		var args = [];
-		for (var i = 2; i < arguments.length; i++) {
-			args.push(arguments[i]);
-		}
+	function safeCall(func, summoner) {
+		var args = [].slice.call(arguments, 2);
 		waitQueue(createBlock(), function() {
 			func.apply(summoner, args);
 		});
 		return summoner;
+	}
+
+	var blocks = [];
+	var blockingIndex = 0;
+
+	function createBlock() {
+		var index = blockingIndex++;
+		blocks.push(index);
+		return index;
+	}
+
+	function waitQueue(index, func) {
+		var interval = setInterval(function() {
+			if (blocks[0] === index) {
+				clearInterval(interval);
+				func();
+			}
+		}, 1);
+	}
+
+	function freeBlock() {
+		blocks.shift();
 	}
 
 	function hide(speed, callback) {
@@ -499,28 +518,6 @@ function jQuery(elements) {
 			deltas.push(parseStyleValue(value));
 		}
 		return deltas;
-	}
-
-	var blocks = [];
-	var blockingIndex = 0;
-
-	function createBlock() {
-		var index = blockingIndex++;
-		blocks.push(index);
-		return index;
-	}
-
-	function waitQueue(index, func) {
-		var interval = setInterval(function() {
-			if (blocks[0] === index) {
-				clearInterval(interval);
-				func();
-			}
-		}, 1);
-	}
-
-	function freeBlock() {
-		blocks.shift();
 	}
 
 	function Timer(func, count, callback) {
