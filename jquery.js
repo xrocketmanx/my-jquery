@@ -637,6 +637,7 @@ function jQuery(elements) {
 				elements[i].innerHTML = value(i, elements[i].innerHTML);
 			}
 		}
+		return this;
 	};
 
 	this.text = function(value) {
@@ -655,6 +656,7 @@ function jQuery(elements) {
 				elements[i].innerText = value(i, elements[i].innerText);
 			}
 		}
+		return this;
 	};
 
 	this.val = function(value) {
@@ -669,6 +671,7 @@ function jQuery(elements) {
 				elements[i].value = value(i, elements[i].value);
 			}
 		}
+		return this;
 	};
 
 	this.attr = function(attr, value) {
@@ -689,6 +692,7 @@ function jQuery(elements) {
 				}
 			}
 		} 
+		return this;
 	};
 
 	this.append = function() {
@@ -697,6 +701,7 @@ function jQuery(elements) {
 				parent.appendChild(nodes[i].cloneNode(true));
 			}
 		}, arguments);
+		return this;
 	};
 
 	this.appendTo = function() {
@@ -708,6 +713,7 @@ function jQuery(elements) {
 			}
 			object.append(this);
 		}
+		return this;
 	};
 
 	this.prepend = function() {
@@ -724,6 +730,7 @@ function jQuery(elements) {
 				}
 			}
 		}, arguments);
+		return this;
 	};
 
 	this.after = function() {
@@ -740,6 +747,7 @@ function jQuery(elements) {
 				}
 			}
 		}, arguments);
+		return this;
 	};
 
 	this.before = function() {
@@ -748,18 +756,21 @@ function jQuery(elements) {
 				element.parentNode.insertBefore(nodes[i], element);
 			}
 		}, arguments);
+		return this;
 	};
 
 	this.remove = function() {
 		for (var i = 0; i < length; i++) {
 			elements[i].parentNode.removeChild(elements[i]);
 		}
+		return this;
 	};
 
 	this.empty = function() {
 		for (var i = 0; i < length; i++) {
 			elements[i].innerHTML = "";
 		}
+		return this;
 	};
 
 	function addElement(addFunction) {
@@ -789,6 +800,7 @@ function jQuery(elements) {
 		for (var i = 0; i < length; i++) {
 			elements[i].classList.add.apply(elements[i].classList, classes);
 		}
+		return this;
 	}
 
 	this.removeClass = function(value) {
@@ -796,6 +808,7 @@ function jQuery(elements) {
 		for (var i = 0; i < length; i++) {
 			elements[i].classList.remove.apply(elements[i].classList, classes);
 		}
+		return this;
 	}
 
 	this.toggleClass = function(value) {
@@ -810,6 +823,7 @@ function jQuery(elements) {
 				}
 			}
 		}
+		return this;
 	}
 
 	/************************
@@ -832,6 +846,7 @@ function jQuery(elements) {
 			for (var i = 0; i < length; i++) {
 				setStyle(elements[i], dimension, parseStyleValue(value)); 
 			}
+			return this;
 		}
 	}
 
@@ -866,6 +881,7 @@ function jQuery(elements) {
 					styleValue.value - paddingA.value - paddingB.value + styleValue.measure;
 				setStyle(elements[i], dimension, styleValue);
 			}
+			return this;
 		}
 	}
 
@@ -905,12 +921,13 @@ function jQuery(elements) {
 					borderA.value - borderB.value + styleValue.measure;
 				setStyle(elements[i], dimension, styleValue);
 			}
+			return this;
 		}
 	}
 
 	/************************
 	*************************
-	Dimensions
+	Tree navigation
 	*************************
 	************************/
 	this.last = function() {
